@@ -428,37 +428,40 @@ export default function InstructorDashboard() {
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Instructor Dashboard</h1>
                         <p className="mt-2 text-gray-600">Manage your schedule and track your earnings.</p>
                     </div>
-                    <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg mt-4 md:mt-0">
-                        <button
-                            onClick={() => setView('schedule')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'schedule' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
-                        >
-                            Schedule
-                        </button>
-                        <button
-                            onClick={() => setView('logbook')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'logbook' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
-                        >
-                            Logbook
-                        </button>
-                        <button
-                            onClick={() => setView('vehicle')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'vehicle' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
-                        >
-                            Vehicle
-                        </button>
-                        <button
-                            onClick={() => setView('license')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'license' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
-                        >
-                            License
-                        </button>
-                        <button
-                            onClick={() => setView('students')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'students' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
-                        >
-                            Students
-                        </button>
+                    {/* Tabs Navigation - Mobile Responsive */}
+                    <div className="flex overflow-x-auto bg-gray-100 p-1 rounded-lg mt-4 md:mt-0 scrollbar-hide">
+                        <div className="flex space-x-1 md:space-x-2 min-w-max">
+                            <button
+                                onClick={() => setView('schedule')}
+                                className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${view === 'schedule' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                            >
+                                Schedule
+                            </button>
+                            <button
+                                onClick={() => setView('logbook')}
+                                className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${view === 'logbook' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                            >
+                                Logbook
+                            </button>
+                            <button
+                                onClick={() => setView('vehicle')}
+                                className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${view === 'vehicle' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                            >
+                                Vehicle
+                            </button>
+                            <button
+                                onClick={() => setView('license')}
+                                className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${view === 'license' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                            >
+                                License
+                            </button>
+                            <button
+                                onClick={() => setView('students')}
+                                className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${view === 'students' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                            >
+                                Students
+                            </button>
+                        </div>
                     </div>
                 </header>
 
