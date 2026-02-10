@@ -16,13 +16,12 @@ export async function GET(request: Request) {
       WHERE instructor_id = $1 AND status = 'completed'
     `, [userId]);
 
-        // Count total unique students
+        // Count total approved students in the system
         const studentsResult = await client.query(`
-            SELECT COUNT(DISTINCT b.student_id) as count
-            FROM bookings b
-            JOIN slots s ON b.slot_id = s.id
-            WHERE s.instructor_id = $1
-        `, [userId]);
+            SELECT COUNT(*) as count
+            FROM users
+            WHERE role = 'student' AND status = 'approved'
+        `);
 
         // Count upcoming lessons (future slots with at least one booking)
         const upcomingResult = await client.query(`

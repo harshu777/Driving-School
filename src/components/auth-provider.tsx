@@ -8,6 +8,7 @@ interface User {
     name: string;
     email: string;
     role: 'instructor' | 'student';
+    status?: 'pending' | 'approved' | 'rejected';
 }
 
 interface AuthContextType {

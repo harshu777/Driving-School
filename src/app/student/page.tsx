@@ -147,6 +147,42 @@ export default function StudentDashboard() {
                     </div>
                 </header>
 
+                {/* Pending Approval Banner */}
+                {user.status === 'pending' && (
+                    <div className="mb-8 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg shadow-sm">
+                        <div className="flex items-start">
+                            <div className="flex-shrink-0">
+                                <Clock className="h-6 w-6 text-yellow-600" />
+                            </div>
+                            <div className="ml-3 flex-1">
+                                <h3 className="text-lg font-bold text-yellow-800">Account Pending Approval</h3>
+                                <p className="mt-2 text-sm text-yellow-700">
+                                    Your account is currently pending instructor approval. You can view your dashboard, but you won't be able to book lessons until an instructor approves your account.
+                                </p>
+                                <p className="mt-1 text-xs text-yellow-600">
+                                    This usually takes 24-48 hours. You'll receive access once approved.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {user.status === 'rejected' && (
+                    <div className="mb-8 bg-red-50 border-l-4 border-red-400 p-6 rounded-lg shadow-sm">
+                        <div className="flex items-start">
+                            <div className="flex-shrink-0">
+                                <AlertCircle className="h-6 w-6 text-red-600" />
+                            </div>
+                            <div className="ml-3 flex-1">
+                                <h3 className="text-lg font-bold text-red-800">Account Not Approved</h3>
+                                <p className="mt-2 text-sm text-red-700">
+                                    Your account registration was not approved. Please contact an instructor for more information.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8">
                     {/* My Progress - Always Visible */}
                     <section className="bg-white shadow rounded-lg p-6 flex flex-col items-center justify-center text-center lg:col-span-1">
@@ -183,7 +219,7 @@ export default function StudentDashboard() {
                         {nextLesson ? (
                             <div className="bg-slate-50 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between border border-slate-200">
                                 <div className="mb-4 sm:mb-0">
-                                    <p className="text-lg font-bold text-slate-900">{new Date(nextLesson.start_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                                    <p className="text-lg font-bold text-slate-900">{new Date(nextLesson.start_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })}</p>
                                     <p className="text-gray-600">Instructor: {nextLesson.instructor_name}</p>
                                 </div>
                                 <Countdown targetDate={nextLesson.start_time} />
@@ -265,16 +301,16 @@ export default function StudentDashboard() {
                                                 {new Date(slot.start_time).toLocaleDateString(undefined, { weekday: 'long' })}
                                             </p>
                                             <p className="text-md text-slate-700 mb-3">
-                                                {new Date(slot.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                                                {new Date(slot.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })}
                                             </p>
                                             <p className="text-sm text-gray-500 mb-4">Instructor: {slot.instructor_name}</p>
 
                                             <button
                                                 onClick={() => handleBookSlot(slot.id)}
-                                                disabled={bookingLoading === slot.id}
-                                                className="w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-600 disabled:opacity-50"
+                                                disabled={bookingLoading === slot.id || user.status !== 'approved'}
+                                                className="w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                {bookingLoading === slot.id ? 'Booking...' : 'Book Slot'}
+                                                {bookingLoading === slot.id ? 'Booking...' : user.status !== 'approved' ? 'Approval Required' : 'Book Slot'}
                                             </button>
                                         </div>
                                     ))}
@@ -335,7 +371,7 @@ export default function StudentDashboard() {
                                                                 {new Date(entry.start_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                                                             </span>
                                                             <span className="text-xs text-slate-500">
-                                                                {new Date(entry.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                {new Date(entry.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
                                                             </span>
                                                         </div>
                                                     </td>

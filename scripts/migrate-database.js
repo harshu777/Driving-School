@@ -16,7 +16,7 @@ async function runMigrations() {
     const client = await pool.connect();
 
     try {
-        console.log('🚀 Starting database migrations...\n');
+        console.log('🚀 Starting comprehensive database migrations...\n');
         await client.query('BEGIN');
 
         // ========================================
@@ -30,7 +30,8 @@ async function runMigrations() {
                 email VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 role VARCHAR(50) NOT NULL CHECK (role IN ('instructor', 'student')),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                status VARCHAR(20) DEFAULT 'approved' NOT NULL CHECK (status IN ('pending', 'approved', 'rejected')),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
         `);
         console.log('✅ Users table created\n');
@@ -44,9 +45,9 @@ async function runMigrations() {
                 id SERIAL PRIMARY KEY,
                 instructor_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
                 student_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-                start_time TIMESTAMP NOT NULL,
+                start_time TIMESTAMP WITH TIME ZONE NOT NULL,
                 status VARCHAR(50) NOT NULL CHECK (status IN ('available', 'booked', 'completed')),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 max_students INTEGER DEFAULT 4,
                 booked_count INTEGER DEFAULT 0
             );
@@ -62,7 +63,7 @@ async function runMigrations() {
                 id SERIAL PRIMARY KEY,
                 slot_id INTEGER REFERENCES slots(id) ON DELETE CASCADE,
                 student_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 km_driven NUMERIC DEFAULT 0,
                 grade VARCHAR(50),
                 instructor_notes TEXT,
@@ -83,9 +84,9 @@ async function runMigrations() {
                 status VARCHAR(50) NOT NULL DEFAULT 'applied',
                 student_details JSONB DEFAULT '{}',
                 license_number VARCHAR(50),
-                certificate_issued_at TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                certificate_issued_at TIMESTAMP WITH TIME ZONE,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
         `);
 
@@ -112,7 +113,7 @@ async function runMigrations() {
                 next_service_due_date DATE,
                 insurance_expiry_date DATE,
                 road_tax_expiry_date DATE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
         `);
         console.log('✅ Vehicles table created\n');
@@ -130,7 +131,7 @@ async function runMigrations() {
                 cost_per_liter DECIMAL(5, 2) NOT NULL,
                 total_cost DECIMAL(7, 2) NOT NULL,
                 odometer_reading INTEGER NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
         `);
         console.log('✅ Fuel logs table created\n');
@@ -148,10 +149,45 @@ async function runMigrations() {
                 cost DECIMAL(7, 2) NOT NULL,
                 description TEXT,
                 garage_name VARCHAR(100),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
         `);
         console.log('✅ Maintenance logs table created\n');
+
+        // ========================================
+        // 8. ADD PERFORMANCE INDEXES
+        // ========================================
+        console.log('📊 Adding performance indexes...');
+
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_bookings_student_id ON bookings(student_id);
+        `);
+        console.log('  ✅ Created index: idx_bookings_student_id');
+
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_slots_instructor_id ON slots(instructor_id);
+        `);
+        console.log('  ✅ Created index: idx_slots_instructor_id');
+
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_slots_start_time ON slots(start_time);
+        `);
+        console.log('  ✅ Created index: idx_slots_start_time');
+
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_slots_status ON slots(status);
+        `);
+        console.log('  ✅ Created index: idx_slots_status');
+
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_vehicles_instructor_id ON vehicles(instructor_id);
+        `);
+        console.log('  ✅ Created index: idx_vehicles_instructor_id');
+
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_license_applications_status ON license_applications(status);
+        `);
+        console.log('  ✅ Created index: idx_license_applications_status\n');
 
         await client.query('COMMIT');
 
@@ -170,6 +206,49 @@ async function runMigrations() {
         console.log('📊 Database tables:');
         tables.rows.forEach(row => {
             console.log(`   ✓ ${row.table_name}`);
+        });
+        console.log('');
+
+        // Verify timestamp columns
+        const timestampCheck = await client.query(`
+            SELECT 
+                table_name, 
+                column_name, 
+                data_type 
+            FROM information_schema.columns 
+            WHERE table_schema = 'public' 
+                AND (column_name LIKE '%_at' OR column_name LIKE '%_time')
+            ORDER BY table_name, column_name;
+        `);
+
+        console.log('📅 Timestamp columns (all should be "timestamp with time zone"):');
+        let allCorrect = true;
+        timestampCheck.rows.forEach(row => {
+            const isCorrect = row.data_type === 'timestamp with time zone';
+            const icon = isCorrect ? '✅' : '⚠️';
+            console.log(`   ${icon} ${row.table_name}.${row.column_name}: ${row.data_type}`);
+            if (!isCorrect) allCorrect = false;
+        });
+
+        if (!allCorrect) {
+            console.log('\n⚠️  Some timestamp columns need timezone conversion. Run timezone fix migration.');
+        }
+        console.log('');
+
+        // Verify indexes
+        const indexCheck = await client.query(`
+            SELECT 
+                tablename, 
+                indexname 
+            FROM pg_indexes 
+            WHERE schemaname = 'public' 
+                AND indexname LIKE 'idx_%'
+            ORDER BY tablename, indexname;
+        `);
+
+        console.log('🔍 Performance indexes:');
+        indexCheck.rows.forEach(row => {
+            console.log(`   ✅ ${row.tablename}: ${row.indexname}`);
         });
         console.log('');
 

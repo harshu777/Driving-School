@@ -24,11 +24,14 @@ export async function POST(request: Request) {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
+            // Set status based on role: students need approval, instructors are auto-approved
+            const status = role === 'student' ? 'pending' : 'approved';
+
             const result = await client.query(`
-        INSERT INTO users (name, email, password, role)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, name, email, role
-      `, [name, email, hashedPassword, role]);
+        INSERT INTO users (name, email, password, role, status)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, name, email, role, status
+      `, [name, email, hashedPassword, role, status]);
 
             return NextResponse.json({ user: result.rows[0] });
         } finally {

@@ -18,6 +18,28 @@ export async function POST(request: Request) {
             // Begin transaction
             await client.query('BEGIN');
 
+            // Check if student is approved
+            const studentCheck = await client.query(
+                'SELECT status FROM users WHERE id = $1 AND role = $2',
+                [userId, 'student']
+            );
+
+            if (studentCheck.rows.length === 0) {
+                await client.query('ROLLBACK');
+                return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+            }
+
+            const studentStatus = studentCheck.rows[0].status;
+            if (studentStatus === 'pending') {
+                await client.query('ROLLBACK');
+                return NextResponse.json({ error: 'Your account is pending approval. Please wait for instructor approval before booking lessons.' }, { status: 403 });
+            }
+
+            if (studentStatus === 'rejected') {
+                await client.query('ROLLBACK');
+                return NextResponse.json({ error: 'Your account has been rejected. Please contact an instructor.' }, { status: 403 });
+            }
+
             // Check if slot is full AND lock it
             const checkRes = await client.query('SELECT booked_count, max_students FROM slots WHERE id = $1 FOR UPDATE', [slotId]);
 

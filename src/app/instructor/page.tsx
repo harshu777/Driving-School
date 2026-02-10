@@ -11,6 +11,7 @@ import CustomCalendar from '@/components/CustomCalendar';
 import { format } from 'date-fns';
 import VehicleManager from '@/components/VehicleManager';
 import LicenseManager from '@/components/LicenseManager';
+import PendingStudents from '@/components/PendingStudents';
 
 interface Student {
     id: number;
@@ -51,7 +52,7 @@ const LogbookModal = ({ isOpen, onClose, slot, onSave }: any) => {
                 </div>
                 <div className="p-6">
                     <p className="text-sm text-gray-500 mb-6">
-                        {new Date(slot.start_time).toLocaleString()} - Enter details for each student.
+                        {new Date(slot.start_time).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })} - Enter details for each student.
                     </p>
                     <div className="space-y-6">
                         {slot.students?.map((student: any) => (
@@ -208,7 +209,7 @@ const StudentHistoryModal = ({ isOpen, onClose, studentId, studentName }: any) =
                                                         {new Date(entry.start_time).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {new Date(entry.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        {new Date(entry.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                                                         {entry.km_driven || '-'}
@@ -250,7 +251,7 @@ export default function InstructorDashboard() {
     const { user, loading } = useAuth();
     const router = useRouter();
     const [slots, setSlots] = useState<Slot[]>([]);
-    const [view, setView] = useState<'schedule' | 'logbook' | 'vehicle' | 'license'>('schedule');
+    const [view, setView] = useState<'schedule' | 'logbook' | 'vehicle' | 'license' | 'students'>('schedule');
     const [stats, setStats] = useState<Stats>({ completedLessons: 0, totalStudents: 0, upcomingLessons: 0 });
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
@@ -451,6 +452,12 @@ export default function InstructorDashboard() {
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'license' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
                         >
                             License
+                        </button>
+                        <button
+                            onClick={() => setView('students')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'students' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                        >
+                            Students
                         </button>
                     </div>
                 </header>
@@ -676,7 +683,7 @@ export default function InstructorDashboard() {
                                                                             isBooked ? 'bg-blue-500' : 'bg-orange-500'
                                                                             }`} />
                                                                         <span className="text-sm font-medium text-slate-700">
-                                                                            {new Date(slot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                            {new Date(slot.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
                                                                         </span>
                                                                         <span className={`ml-2 text-xs font-bold px-2 py-0.5 rounded-full border ${currentCount >= maxCount
                                                                             ? 'bg-red-50 text-red-600 border-red-200'
@@ -730,7 +737,7 @@ export default function InstructorDashboard() {
                                                                 <li key={slot.id} className={`border rounded-lg p-3 transition-all ${slot.status === 'completed' ? 'bg-gray-50 border-gray-200' : 'bg-white border-orange-200 shadow-sm'}`}>
                                                                     <div className="flex justify-between items-start mb-2">
                                                                         <span className="text-sm font-bold text-slate-900">
-                                                                            {new Date(slot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                            {new Date(slot.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
                                                                         </span>
                                                                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${slot.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
                                                                             }`}>
@@ -795,6 +802,18 @@ export default function InstructorDashboard() {
                 {view === 'license' && (
                     <LicenseManager />
                 )}
+
+                {view === 'students' && (
+                    <PendingStudents />
+                )}
+
+                {/* Logbook Modal - Rendered globally for Schedule view */}
+                <LogbookModal
+                    isOpen={!!selectedSlot}
+                    onClose={() => setSelectedSlot(null)}
+                    slot={selectedSlot}
+                    onSave={handleLogbookSave}
+                />
             </main>
         </div>
     );
@@ -806,6 +825,7 @@ const LogbookView = ({ user }: { user: any }) => {
     const [history, setHistory] = useState<any[]>([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [editingLog, setEditingLog] = useState<any | null>(null);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -996,6 +1016,7 @@ const LogbookView = ({ user }: { user: any }) => {
                                                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Distance</th>
                                                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Performance</th>
                                                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Instructor Notes</th>
+                                                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-slate-100">
@@ -1007,7 +1028,7 @@ const LogbookView = ({ user }: { user: any }) => {
                                                                     {new Date(entry.start_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                                                                 </span>
                                                                 <span className="text-xs text-slate-500">
-                                                                    {new Date(entry.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                    {new Date(entry.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
                                                                 </span>
                                                             </div>
                                                         </td>
@@ -1041,6 +1062,17 @@ const LogbookView = ({ user }: { user: any }) => {
                                                             <p className="text-sm text-slate-600 max-w-xs truncate" title={entry.instructor_notes}>
                                                                 {entry.instructor_notes || '-'}
                                                             </p>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <button
+                                                                onClick={() => setEditingLog(entry)}
+                                                                className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                </svg>
+                                                                Edit
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1114,6 +1146,59 @@ const LogbookView = ({ user }: { user: any }) => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Edit Log Modal */}
+                        {editingLog && (
+                            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                                >
+                                    <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                                        <h3 className="text-xl font-bold text-slate-900">Edit Logbook Entry</h3>
+                                        <button onClick={() => setEditingLog(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+                                    </div>
+                                    <div className="p-6">
+                                        <p className="text-sm text-gray-500 mb-6">
+                                            {new Date(editingLog.start_time).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })}
+                                        </p>
+                                        <StudentLogEntry
+                                            student={{
+                                                booking_id: editingLog.booking_id,
+                                                name: students.find(s => s.id === selectedStudentId)?.name || 'Student',
+                                                km_driven: editingLog.km_driven,
+                                                notes: editingLog.instructor_notes,
+                                                grade: editingLog.grade
+                                            }}
+                                            onSave={async (bookingId: number, data: any) => {
+                                                try {
+                                                    const res = await fetch('/api/instructor/booking/update', {
+                                                        method: 'PUT',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'x-user-id': user.id.toString()
+                                                        },
+                                                        body: JSON.stringify({ bookingId, ...data })
+                                                    });
+                                                    if (res.ok) {
+                                                        // Refresh history
+                                                        const historyRes = await fetch(`/api/instructor/student/${selectedStudentId}/history`, {
+                                                            headers: { 'x-user-id': user.id.toString() }
+                                                        });
+                                                        const historyData = await historyRes.json();
+                                                        setHistory(Array.isArray(historyData) ? historyData : []);
+                                                        setEditingLog(null);
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Failed to update log:', error);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </motion.div>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
