@@ -28,10 +28,10 @@ export default function Navbar() {
                             <Link href="/" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-orange-500 transition-colors">
                                 Home
                             </Link>
-                            <Link href="#about" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-orange-500 transition-colors">
+                            <Link href="/about" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-orange-500 transition-colors">
                                 About
                             </Link>
-                            <Link href="#contact" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-orange-500 transition-colors">
+                            <Link href="/contact" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-orange-500 transition-colors">
                                 Contact
                             </Link>
 
@@ -106,14 +106,14 @@ export default function Navbar() {
                                         Home
                                     </Link>
                                     <Link
-                                        href="#about"
+                                        href="/about"
                                         onClick={toggleMenu}
                                         className="block rounded-md px-3 py-2 text-base font-medium hover:bg-slate-800 hover:text-orange-500 text-gray-300 transition-colors"
                                     >
                                         About
                                     </Link>
                                     <Link
-                                        href="#contact"
+                                        href="/contact"
                                         onClick={toggleMenu}
                                         className="block rounded-md px-3 py-2 text-base font-medium hover:bg-slate-800 hover:text-orange-500 text-gray-300 transition-colors"
                                     >

@@ -9,6 +9,7 @@ import ProgressBar from '@/components/ProgressBar';
 import Countdown from '@/components/Countdown';
 import { useDateTabs } from '@/hooks/useDateTabs';
 import LicenseHub from '@/components/LicenseHub';
+import LearningHub from '@/components/LearningHub';
 
 interface Slot {
     id: number;
@@ -94,7 +95,7 @@ export default function StudentDashboard() {
     const nextLesson = progress.upcoming.length > 0 ? progress.upcoming[0] : null;
 
     // View State for Logbook
-    const [view, setView] = useState<'book' | 'history' | 'license'>('book');
+    const [view, setView] = useState<'book' | 'history' | 'license' | 'learning'>('book');
     const [history, setHistory] = useState<any[]>([]);
 
     // Pagination State
@@ -143,6 +144,12 @@ export default function StudentDashboard() {
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'license' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
                         >
                             License
+                        </button>
+                        <button
+                            onClick={() => setView('learning')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${view === 'learning' ? 'bg-white text-slate-900 shadow' : 'text-gray-600 hover:text-slate-900'}`}
+                        >
+                            Learning
                         </button>
                     </div>
                 </header>
@@ -481,6 +488,8 @@ export default function StudentDashboard() {
                     </div>
                 ) : view === 'license' ? (
                     <LicenseHub />
+                ) : view === 'learning' ? (
+                    <LearningHub />
                 ) : null}
             </main>
         </div>
