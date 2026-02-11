@@ -5,15 +5,36 @@ import { useState } from 'react';
 import { Send } from 'lucide-react';
 
 export default function ContactForm() {
-    const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+    const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormStatus('submitting');
-        // Simulate API call
-        setTimeout(() => {
-            setFormStatus('success');
-        }, 1500);
+
+        const formData = new FormData(e.target as HTMLFormElement);
+        const data = {
+            firstName: formData.get('firstName'),
+            lastName: formData.get('lastName'),
+            email: formData.get('email'),
+            message: formData.get('message')
+        };
+
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                setFormStatus('success');
+            } else {
+                setFormStatus('error');
+            }
+        } catch (err) {
+            console.error(err);
+            setFormStatus('error');
+        }
     };
 
     if (formStatus === 'success') {
@@ -36,22 +57,22 @@ export default function ContactForm() {
             <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">First Name</label>
-                    <input type="text" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="John" />
+                    <input type="text" name="firstName" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="John" />
                 </div>
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Last Name</label>
-                    <input type="text" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="Doe" />
+                    <input type="text" name="lastName" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="Doe" />
                 </div>
             </div>
 
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Email Address</label>
-                <input type="email" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="john@example.com" />
+                <input type="email" name="email" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="john@example.com" />
             </div>
 
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Message</label>
-                <textarea required rows={4} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all resize-none" placeholder="How can we help you?"></textarea>
+                <textarea name="message" required rows={4} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all resize-none" placeholder="How can we help you?"></textarea>
             </div>
 
             <button
@@ -65,6 +86,9 @@ export default function ContactForm() {
                     </>
                 )}
             </button>
+            {formStatus === 'error' && (
+                <p className="text-red-600 text-center font-medium">Failed to send message. Please try again.</p>
+            )}
         </form>
     );
 }
