@@ -24,9 +24,9 @@ export const metadata: Metadata = {
   description: "Professional driving lessons for everyone.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icons/icon-192x192.png",
-    shortcut: "/icons/icon-192x192.png",
-    apple: "/icons/icon-192x192.png",
+    icon: "/icons/icon.svg",
+    shortcut: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
   },
   appleWebApp: {
     capable: true,
