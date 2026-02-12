@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from '@/components/Navbar';
+import Image from 'next/image';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -12,72 +13,92 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white pt-24 pb-32 lg:pt-40 lg:pb-48 overflow-hidden">
-        {/* Abstract Doodle Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <svg className="absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 opacity-10" width="600" height="600" viewBox="0 0 600 600">
-            <circle cx="300" cy="300" r="300" fill="white" />
-          </svg>
-          <svg className="absolute bottom-0 left-0 transform -translate-x-1/3 translate-y-1/3 opacity-10" width="400" height="400" viewBox="0 0 400 400">
-            <rect x="0" y="0" width="400" height="400" rx="40" transform="rotate(45 200 200)" fill="white" />
-          </svg>
-          {/* road lines effect */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-40 w-full flex justify-center space-x-20 opacity-10">
-            <div className="w-4 h-full bg-white skew-x-12"></div>
-            <div className="w-4 h-full bg-white skew-x-12"></div>
+      <section className="relative bg-gradient-to-br from-orange-50 via-white to-orange-50 pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="inline-block py-1 px-3 rounded-full bg-orange-100 text-orange-600 text-sm font-bold mb-6 border border-orange-200">
+                  🏆 #1 Rated Driving School in Pune
+                </span>
+                <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
+                  Master the Road with <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">Confidence</span>
+                </h1>
+                <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                  Join thousands of successful drivers. Our certified instructors and modern fleet ensure you pass your test and drive safely for life.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Link href="/register" className="px-8 py-4 bg-orange-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-orange-500/20 hover:bg-orange-700 hover:scale-105 transition-all flex items-center justify-center gap-2">
+                    <Car className="w-5 h-5" /> Book Your First Lesson
+                  </Link>
+                  <Link href="/about" className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold text-lg hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2">
+                    Learn More
+                  </Link>
+                </div>
+
+                <div className="mt-10 flex items-center justify-center lg:justify-start gap-4">
+                  <div className="flex -space-x-3">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 overflow-hidden relative">
+                        <div className={`w-full h-full bg-slate-300`} />
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div className="flex text-orange-400 text-sm">
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                    </div>
+                    <p className="text-sm text-slate-500 font-medium">Trusted by 500+ Students</p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right Image */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative lg:h-[600px] w-full flex items-center justify-center"
+            >
+              <div className="relative w-full aspect-square max-w-[600px] lg:max-w-none">
+                {/* Blob Background */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-orange-400/10 rounded-full blur-3xl -z-10" />
+
+                <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-all duration-500">
+                  <Image
+                    src="/hero.png"
+                    alt="Happy student driver and instructor"
+                    width={600}
+                    height={600}
+                    className="object-cover w-full h-full"
+                    priority
+                  />
+                </div>
+
+                {/* Floating Badge */}
+                <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 animate-bounce-slow">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                    <ShieldCheck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-slate-900 font-bold">100% Safety</p>
+                    <p className="text-xs text-slate-500">Certified Instructors</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 inline-block"
-          >
-            <span className="bg-orange-600/20 text-orange-400 py-1 px-4 rounded-full text-sm font-semibold border border-orange-500/30">
-              #1 Rated Driving School
-            </span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl mb-6"
-          >
-            Master the Road with <br />
-            <span className="text-orange-500 relative inline-block">
-              Confidence
-              <svg className="absolute w-full h-3 -bottom-1 left-0 text-orange-600 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
-              </svg>
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-6 text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed"
-          >
-            Professional driving lessons tailored to your needs. Safety first, skills forever.
-            Join thousands of successful drivers who passed with DriveSafe.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-10 flex justify-center gap-4 flex-col sm:flex-row px-4"
-          >
-            <Link href="/login" className="rounded-xl bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl hover:bg-orange-700 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
-              <Car className="w-5 h-5" /> Start Driving
-            </Link>
-            <Link href="/about" className="rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 px-8 py-4 text-lg font-bold text-white hover:bg-white hover:text-slate-900 transition-all flex items-center justify-center gap-2">
-              Learn More
-            </Link>
-          </motion.div>
         </div>
       </section>
 

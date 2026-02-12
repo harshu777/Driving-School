@@ -11,7 +11,7 @@ import CustomCalendar from '@/components/CustomCalendar';
 import { format } from 'date-fns';
 import VehicleManager from '@/components/VehicleManager';
 import LicenseManager from '@/components/LicenseManager';
-import PendingStudents from '@/components/PendingStudents';
+import StudentManager from '@/components/StudentManager';
 
 interface Student {
     id: number;
@@ -804,7 +804,7 @@ export default function InstructorDashboard() {
                 )}
 
                 {view === 'students' && (
-                    <PendingStudents />
+                    <StudentManager />
                 )}
 
                 {/* Logbook Modal - Rendered globally for Schedule view */}

@@ -9,13 +9,26 @@ export async function GET(request: Request) {
 
     const client = await pool.connect();
     try {
-        // Fetch all approved students in the system
-        const result = await client.query(`
-            SELECT id, name, email
+        const { searchParams } = new URL(request.url);
+        const status = searchParams.get('status');
+
+        let query = `
+            SELECT id, name, email, status, created_at
             FROM users
-            WHERE role = 'student' AND status = 'approved'
-            ORDER BY name ASC
-        `);
+            WHERE role = 'student'
+        `;
+
+        const values: any[] = [];
+
+        // If status is provided and not 'all', filter by it. Default to 'approved' if not 'all'.
+        if (status !== 'all') {
+            query += ` AND status = $1`;
+            values.push(status || 'approved');
+        }
+
+        query += ` ORDER BY created_at DESC`; // Order by newest first generally better for management
+
+        const result = await client.query(query, values);
 
         return NextResponse.json(result.rows);
     } catch (error) {
