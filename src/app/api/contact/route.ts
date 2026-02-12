@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         });
 
         const mailOptions = {
-            from: `"${firstName} ${lastName}" <${user}>`, // Display name helps identify the sender
+            from: `"Driving School" <${user}>`, // Sender name is now static "Driving School"
             to: 'hbaviskar1106@gmail.com', // Send to the owner
             replyTo: email, // Reply to the person who filled the form
             subject: `New Contact Form Message from ${firstName} ${lastName}`,
@@ -66,10 +66,10 @@ export async function POST(req: Request) {
         await transporter.sendMail(mailOptions);
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error sending email:', error);
         return NextResponse.json(
-            { error: 'Failed to send message' },
+            { error: error.message || 'Failed to send message' },
             { status: 500 }
         );
     }
