@@ -57,22 +57,22 @@ export default function ContactForm() {
             <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">First Name</label>
-                    <input type="text" name="firstName" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="John" />
+                    <input type="text" name="firstName" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-gray-900" placeholder="John" />
                 </div>
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Last Name</label>
-                    <input type="text" name="lastName" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="Doe" />
+                    <input type="text" name="lastName" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-gray-900" placeholder="Doe" />
                 </div>
             </div>
 
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Email Address</label>
-                <input type="email" name="email" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all" placeholder="john@example.com" />
+                <input type="email" name="email" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-gray-900" placeholder="john@example.com" />
             </div>
 
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Message</label>
-                <textarea name="message" required rows={4} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all resize-none" placeholder="How can we help you?"></textarea>
+                <textarea name="message" required rows={4} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all resize-none text-gray-900" placeholder="How can we help you?"></textarea>
             </div>
 
             <button
